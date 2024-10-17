@@ -1,0 +1,3 @@
+cd " "
+
+java org.example.Main
