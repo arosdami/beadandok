@@ -4,7 +4,11 @@
 
 #define MAX_LINE_LENGTH 256
 #define KEY_LENGTH 5
-int key[KEY_LENGTH] = {5, -14, 31, -9, 3};  // Dekódoló kulcs
+int key[KEY_LENGTH] = {5, -14, 31, -9, 3};  // Titkosítási kulcs
+
+// Fájl elérési útvonalak
+#define JELSZO_FAJL "/home/digit/Public/C_bead/jelszo.bin"
+#define TELEFONKONYV_FAJL "/home/digit/Public/C_bead/telefonkonyv.bin"
 
 // Dekódoló függvény
 void decode_line(char *line) {
@@ -29,7 +33,6 @@ int authenticate_user(const char *username, const char *password) {
         strcpy(decoded_line, encoded_line);
         decode_line(decoded_line);
 
-        // Felhasználónév és jelszó különválasztása
         char *stored_username = strtok(decoded_line, "*");
         char *stored_password = strtok(NULL, "\n");
 
@@ -43,36 +46,6 @@ int authenticate_user(const char *username, const char *password) {
 
     fclose(file);
     return auth_success;
-}
-
-// Telefonkönyv keresési funkció
-void search_in_phonebook(const char *query, int search_by_name) {
-    FILE *file = fopen(TELEFONKONYV_FAJL, "rb");
-    if (!file) {
-        perror("Nem sikerült megnyitni a telefonkönyvet");
-        return;
-    }
-
-    char encoded_line[MAX_LINE_LENGTH];
-    char decoded_line[MAX_LINE_LENGTH];
-    int found = 0;
-
-    while (fgets(encoded_line, MAX_LINE_LENGTH, file)) {
-        strcpy(decoded_line, encoded_line);
-        decode_line(decoded_line);
-
-        // Keresés név vagy telefonszám alapján
-        if ((search_by_name && strstr(decoded_line, query)) || (!search_by_name && strstr(decoded_line, query))) {
-            printf("Találat: %s\n", decoded_line);
-            found = 1;
-        }
-    }
-
-    if (!found) {
-        printf("Nincs találat a keresésre.\n");
-    }
-
-    fclose(file);
 }
 
 // Telefonkönyv böngészése
@@ -96,57 +69,73 @@ void browse_phonebook() {
     fclose(file);
 }
 
-// Menü megjelenítése
-void display_menu() {
-    printf("\nMenü:\n");
-    printf("1. Keresés névre\n");
-    printf("2. Keresés telefonszámra\n");
-    printf("3. Telefonkönyv böngészése\n");
-    printf("4. Kilépés\n");
+// Keresés a telefonkönyvben
+void search_in_phonebook(const char *query) {
+    FILE *file = fopen(TELEFONKONYV_FAJL, "rb");
+    if (!file) {
+        perror("Nem sikerült megnyitni a telefonkönyvet");
+        return;
+    }
+
+    char encoded_line[MAX_LINE_LENGTH];
+    char decoded_line[MAX_LINE_LENGTH];
+    int found = 0;
+
+    while (fgets(encoded_line, MAX_LINE_LENGTH, file)) {
+        strcpy(decoded_line, encoded_line);
+        decode_line(decoded_line);
+
+        if (strstr(decoded_line, query)) {
+            printf("Találat: %s\n", decoded_line);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("Nincs találat a keresésre.\n");
+    }
+
+    fclose(file);
 }
 
 // Főprogram
 int main() {
     char username[50], password[50];
 
-    // Felhasználói név és jelszó bekérése
     printf("Felhasználónév: ");
     scanf("%49s", username);
     printf("Jelszó: ");
     scanf("%49s", password);
 
-    // Hitelesítés
     if (authenticate_user(username, password)) {
         printf("Sikeres bejelentkezés!\n");
 
         int choice;
         do {
-            display_menu();
-            printf("Válasszon egy opciót: ");
+            printf("\nMenü:\n");
+            printf("1. Telefonkönyv böngészése\n");
+            printf("2. Keresés név/telefonszám alapján\n");
+            printf("3. Kilépés\n");
+            printf("Válassz egy opciót: ");
             scanf("%d", &choice);
 
             char query[50];
             switch (choice) {
                 case 1:
-                    printf("Keresett név: ");
-                    scanf("%49s", query);
-                    search_in_phonebook(query, 1);
-                    break;
-                case 2:
-                    printf("Keresett telefonszám: ");
-                    scanf("%49s", query);
-                    search_in_phonebook(query, 0);
-                    break;
-                case 3:
                     browse_phonebook();
                     break;
-                case 4:
+                case 2:
+                    printf("Keresett név vagy telefonszám: ");
+                    scanf("%49s", query);
+                    search_in_phonebook(query);
+                    break;
+                case 3:
                     printf("Kilépés...\n");
                     break;
                 default:
-                    printf("Érvénytelen választás, próbálja újra.\n");
+                    printf("Érvénytelen választás, próbáld újra.\n");
             }
-        } while (choice != 4);
+        } while (choice != 3);
     } else {
         printf("Helytelen felhasználónév vagy jelszó.\n");
     }
