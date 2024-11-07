@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizsgafeladat - Felhasználó hitelesítés és telefonkönyv</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+        main {
+            margin: 20px;
+        }
+        .code {
+            background-color: #282828;
+            color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        h2 {
+            color: #333;
+        }
+        .explanation {
+            margin-bottom: 20px;
+        }
+        .difficulties {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Vizsgafeladat: Felhasználó Hitelesítés és Telefonkönyv Böngészése</h1>
+</header>
+
+<main>
+    <section>
+        <h2>A feladat célja</h2>
+        <p>Ez a program egy egyszerű felhasználó hitelesítési rendszert és telefonkönyv böngészőt valósít meg. A felhasználó bejelentkezése után lehetősége van a telefonkönyv rekordjait nyilakkal böngészni. A bejelentkezéshez egy titkosított jelszót és felhasználónevet tartalmazó fájlt használunk, valamint az adatok dekódolása a kulcsok segítségével történik.</p>
+    </section>
+
+    <section>
+        <h2>A program felépítése</h2>
+        <p>A program három fő részből áll:</p>
+        <ul>
+            <li><strong>Felhasználó hitelesítése</strong>: A bejelentkezés során megadott felhasználónév és jelszó összehasonlítása egy titkosított fájllal.</li>
+            <li><strong>Telefonkönyv böngészése</strong>: A sikeres bejelentkezés után a felhasználó böngészheti a telefonkönyvet nyilakkal.</li>
+            <li><strong>Dekódolás</strong>: A jelszavak és telefonkönyvi rekordok kulcsokkal történő dekódolása, hogy a program működhessen.</li>
+        </ul>
+        <h3>Példa kód:</h3>
+        <div class="code">
+            #include &lt;stdio.h&gt;<br>
+            #include &lt;stdlib.h&gt;<br>
+            #include &lt;string.h&gt;<br>
+            #include &lt;ncurses.h&gt; // Ncurses könyvtár nyíl-billentyűk kezeléséhez<br><br>
+
+            #define MAX_SOR_HOSSZ 256<br>
+            #define KULCS_HOSSZ 5<br>
+            int kulcs[KULCS_HOSSZ] = {5, -14, 31, -9, 3};<br><br>
+
+            void dekodol_sor(char *sor) {<br>
+                for (int i = 0; sor[i] != '\0' &amp;&amp; sor[i] != '\n'; i++) {<br>
+                    sor[i] -= kulcs[i % KULCS_HOSSZ];<br>
+                }<br>
+            }<br>
+        </div>
+    </section>
+
+    <section>
+        <h2>Nehezségek és megoldások</h2>
+        <p>A feladat során számos kihívással találkoztam, amit sikerült megoldanom:</p>
+        <div class="difficulties">
+            <h3>1. Dekódolás</h3>
+            <p>A legnagyobb nehézséget a sorok dekódolásában találta. Az alap kulcsokkal történő dekódolás nem működött helyesen, mivel nem figyeltem arra, hogy minden karakterhez a megfelelő kulcsot alkalmazzam. A hibát az okozta, hogy nem a megfelelő indexek alapján csökkentettem a karakterek ASCII értékeit. Ezt úgy javítottam, hogy a kulcsokat ciklikusan alkalmaztam, így a kulcsok végigjárása helyes eredményeket adott.</p>
+        </div>
+
+        <div class="difficulties">
+            <h3>2. Fájlkezelés</h3>
+            <p>Az egyik nehéz feladat a fájlkezelés volt, mivel a bináris fájlok olvasása és a dekódolt sorok kezelése nem volt egyértelmű. A <code>fgets()</code> funkciót használtam a fájl sorainak beolvasására, és a dekódolás után sikerült azokat stringekre bontanom. A legfontosabb hiba itt a fájlok megfelelő bezárása és a fájl elérhetőségének ellenőrzése volt, hogy ne okozzon problémát a program futásában.</p>
+        </div>
+
+        <div class="difficulties">
+            <h3>3. Ncurses integrálása</h3>
+            <p>A telefonkönyv böngészése nyilakkal és a <code>ncurses</code> könyvtár használata volt egy másik kihívás. Az alábbi problémát kellett megoldanom: a navigálás nem mindig reagált gyorsan a billentyűnyomásokra, és a program megfagyott egyes billentyűk lenyomásakor. A hibát úgy orvosoltam, hogy a <code>keypad()</code> funkciót helyesen alkalmaztam, és minden billentyűnyomás után egyértelműen kezeltem a kurzor mozgását.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Következtetés</h2>
+        <p>A program végül sikeresen működik, és a felhasználók képesek lesznek bejelentkezni, böngészni a telefonkönyvet, és megoldani a dekódolás problémáit. A fejlesztés során szerzett tapasztalatok segítettek a fájlkezelés, a dekódolás és az ncurses kezelésének finomításában. Az alkalmazott megoldások biztosítják, hogy a program megfelelően reagáljon a felhasználói interakciókra és biztosítsa a sikeres bejelentkezést és telefonkönyv böngészést.</p>
+    </section>
+</main>
+
+</body>
+</html>
